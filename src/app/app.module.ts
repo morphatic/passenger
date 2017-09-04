@@ -1,5 +1,6 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpModule } from '@angular/http';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
@@ -8,12 +9,16 @@ import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
 import { TabsPage } from '../pages/tabs/tabs';
 
-import { StatusBar } from '@ionic-native/status-bar';
+import { StatusBar    } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationResponse } from '@ionic-native/background-geolocation';
+import { Geolocation  } from '@ionic-native/geolocation';
+import { File         } from '@ionic-native/file';
+import { FileTransfer } from '@ionic-native/file-transfer';
+import { Media        } from '@ionic-native/media';
 
-import { ENV } from '@app/env';
-console.log(ENV.mode);
+import { ENV } from '@app/env'; console.log(ENV.mode);
+import { WeatherApiProvider } from '../providers/weather-api/weather-api';
+import { WatsonApiProvider } from '../providers/watson-api/watson-api';
 
 @NgModule({
   declarations: [
@@ -25,7 +30,8 @@ console.log(ENV.mode);
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(MyApp)
+    IonicModule.forRoot(MyApp),
+    HttpModule,
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -39,7 +45,12 @@ console.log(ENV.mode);
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    BackgroundGeolocation
+    WeatherApiProvider,
+    Geolocation,
+    WatsonApiProvider,
+    File,
+    FileTransfer,
+    Media
   ]
 })
 export class AppModule {}
