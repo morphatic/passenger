@@ -6,8 +6,9 @@
 
 <ion-content padding>
   <h2>Welcome to Passenger!</h2>
-  <button ion-button (click)="ionViewDidEnter()">Check the Weather!</button>
-  <p>
-    {{messages}}
-  </p>
+  <button ion-button id="checkWeatherButton" 
+    (click)="checkWeather()" 
+    (swipeleft)="swipeleft($evt)"
+    (swiperight)="swiperight($evt)"
+    block text-wrap>Check the Weather!</button>
 </ion-content>

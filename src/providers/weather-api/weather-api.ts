@@ -61,7 +61,7 @@ export interface AlertDetail {
   areaId: string;
   areaName: string;
   ianaTimeZone: string;
-  adminDistrictcode?: string;
+  adminDistrictCode?: string;
   adminDistrict?: string;
   countryCode: string;
   countryName: string;
@@ -99,44 +99,117 @@ export interface WeatherHeadlines {
 @Injectable()
 export class WeatherApiProvider {
 
-  private messages = {
-    flood: `Turn around. Don't drown. Over half of all flood-related drownings occur when a
-            vehicle is driving into hazardous flood water. People underestimate the power
-            of water. A mere twelve inches of rushing water is enough to carry away a small
-            car. It is never safe to drive or walk into flood waters.`
+  // private messages = {
+  //   flood: `Turn around. Don't drown. Over half of all flood-related drownings occur when a
+  //           vehicle is driving into hazardous flood water. People underestimate the power
+  //           of water. A mere twelve inches of rushing water is enough to carry away a small
+  //           car. It is never safe to drive or walk into flood waters.`
+  // };
+
+  private mock: WeatherHeadlines = {
+      "metadata": {
+          "next": null
+      },
+      "alerts": [
+          {
+              "detailKey": "50d57e56-3dbe-3afc-b5c3-7c8fb697895e",
+              "messageTypeCode": 1,
+              "messageType": "New",
+              "productIdentifier": "FFA",
+              "phenomena": "FF",
+              "significance": "A",
+              "eventTrackingNumber": "0001",
+              "officeCode": "KPQR",
+              "officeName": "Portland",
+              "officeAdminDistrict": "Oregon",
+              "officeAdminDistrictCode": "OR",
+              "officeCountryCode": "US",
+              "eventDescription": "Flash Flood Warning",
+              "severityCode": 3,
+              "severity": "Moderate",
+              "categories": [
+                  {
+                      "category": "Met",
+                      "categoryCode": 2
+                  }
+              ],
+              "responseTypes": [
+                  {
+                      "responseType": "Avoid",
+                      "responseTypeCode": 5
+                  }
+              ],
+              "urgency": "Unknown",
+              "urgencyCode": 5,
+              "certainty": "Unknown",
+              "certaintyCode": 5,
+              "effectiveTimeLocal": "2017-09-17T16:00:00-07:00",
+              "effectiveTimeLocalTimeZone": "PDT",
+              "expireTimeLocal": "2017-09-18T02:00:00-07:00",
+              "expireTimeLocalTimeZone": "PDT",
+              "expireTimeUTC": 1505725200,
+              "onsetTimeLocal": "2017-09-17T16:00:00-07:00",
+              "onsetTimeLocalTimeZone": "PDT",
+              "flood": {
+                  "floodLocationId": "00000",
+                  "floodLocationName": "N/A",
+                  "floodSeverityCode": "0",
+                  "floodSeverity": "N/A",
+                  "floodImmediateCauseCode": "ER",
+                  "floodImmediateCause": "Excessive Rainfall",
+                  "floodRecordStatusCode": "OO",
+                  "floodRecordStatus": "N/A",
+                  "floodStartTimeLocal": null,
+                  "floodStartTimeLocalTimeZone": null,
+                  "floodCrestTimeLocal": null,
+                  "floodCrestTimeLocalTimeZone": null,
+                  "floodEndTimeLocal": null,
+                  "floodEndTimeLocalTimeZone": null
+              },
+              "areaTypeCode": "Z",
+              "latitude": 45.63,
+              "longitude": -122.07,
+              "areaId": "WAZ045",
+              "areaName": "Western Columbia River Gorge",
+              "ianaTimeZone": "America/Los_Angeles",
+              "adminDistrictCode": "WA",
+              "adminDistrict": "Washington",
+              "countryCode": "US",
+              "countryName": "UNITED STATES OF AMERICA",
+              "headlineText": "Flash Flood Warning from SUN 4:00 PM PDT until MON 2:00 AM PDT",
+              "source": "National Weather Service",
+              "disclaimer": null,
+              "issueTimeLocal": "2017-09-17T03:49:00-07:00",
+              "issueTimeLocalTimeZone": "PDT",
+              "identifier": "962089e581e645207b2a491b6cf02d03",
+              "processTimeUTC": 1505645355
+          }
+      ]
   };
 
   constructor(public http: Http) {}
 
-  public getAlert(lat: string|number, lon: string|number): Observable<WeatherAlert> {
-    return this.getHeadlines(lat, lon).flatMap((hl: WeatherHeadlines) => {
-      if (hl) {
-        let query = new URLSearchParams();
-        query.set('apiKey', ENV.weather.api_key);
-        query.set('format', 'json');
-        query.set('language', 'en-US');
-        for ( let i = 0; i < hl.alerts.length; i += 1 ) {
-          if ( this.is_interesting( hl.alerts[i].eventDescription ) ) {
-            query.set('alertId', hl.alerts[i].detailKey);
-            return this.http.get(ENV.weather.alert_detail, {search: query})
-                            .map((res: Response): WeatherAlert => res.json())
-                            .catch((error: any) => Observable.throw(error.json().error || 'Error getting alert detail'))
-          }
-        }
-      }
-      return Observable.empty<WeatherAlert>();
-    });
-  }
-
-  private getHeadlines(lat: string|number, lon: string|number): Observable<WeatherHeadlines> {
+  getAlerts(lat: string|number, lon: string|number): Observable<AlertDetail[]> {
     let query = new URLSearchParams();
     query.set('geocode', `${lat},${lon}`);
     query.set('format', 'json');
     query.set('language', 'en-US');
     query.set('apiKey', ENV.weather.api_key);
     return this.http.get(ENV.weather.alert_headline, {search: query})
-                    .map((res: Response): WeatherHeadlines => res.json())
+                    // if 204 is res.status, return empty WeatherHeadlines object
+                    .map((res: Response): AlertDetail[] => {
+                      if(204 === res.status) {
+                        let alerts: AlertDetail[] = []
+                        return alerts;
+                      } else {
+                        return res.json().alerts.filter((alert: AlertDetail) => this.is_interesting(alert.eventDescription))
+                      }
+                    })
                     .catch((error: any) => Observable.throw(error.json().error || 'Error getting headlines'));
+  }
+
+  getMockAlerts() {
+    return Observable.of(this.mock.alerts);
   }
 
   private is_interesting = (event: string): boolean => {
@@ -157,7 +230,7 @@ export class WeatherApiProvider {
       'Blizzard Warning',            // *
       'Ice Storm Warning',
       'Lake Effect Snow Warning',
-      'Special Weather Statement'
+      // 'Special Weather Statement'
     ];
     let result = false;
     for ( let i = 0; i < INTERESTING_EVENTS.length; i+= 1 ) {

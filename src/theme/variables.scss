@@ -33,14 +33,38 @@ $app-direction: ltr;
 // colors so you can add, rename and remove colors as needed.
 // The "primary" color is the only required color in the map.
 
+// $colors: (
+//   primary:    #488aff,
+//   secondary:  #32db64,
+//   danger:     #f53d3d,
+//   light:      #f4f4f4,
+//   dark:       #222
+// );
 $colors: (
-  primary:    #488aff,
+  primary:    lighten(rgb(0, 188, 205), 5%),
   secondary:  #32db64,
   danger:     #f53d3d,
   light:      #f4f4f4,
-  dark:       #222
+  dark:       darken(rgb(0, 134, 145), 10%)
 );
 
+.content {
+  background: radial-gradient(
+    ellipse at center,
+    rgb(0, 188, 205),
+    rgb(0, 134, 145)
+  );
+}
+
+.toolbar-background, .tabbar {
+  background-color: #e6e7e8 !important;
+}
+
+#checkWeatherButton {
+  height: 80%;
+  margin: 10% 0;
+  font-size: 2em;
+}
 
 // App iOS Variables
 // --------------------------------------------------
