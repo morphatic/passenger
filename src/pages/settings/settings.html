@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>{{ 'SETTINGS' | translate }}</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+      <ion-label>{{ 'LANG' | translate }}</ion-label>
+      <ion-select [(ngModel)]="language" (ionChange)="selectLanguage($event)">
+        <ion-option *ngFor="let lang of languages" value="{{lang.code}}">{{lang.name}}</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-list radio-group [(ngModel)]="voice" (ionChange)="selectVoice($event)">
+        <ion-list-header>{{ 'VOICE' | translate }}</ion-list-header>
+        <ion-item *ngIf="voices && voices[language] && voices[language].male">
+          <ion-label>{{ 'MALE' | translate}}</ion-label>
+          <ion-radio value="{{voices[language].male}}"></ion-radio>
+        </ion-item>
+        <ion-item *ngIf="voices && voices[language] && voices[language].female">
+          <ion-label>{{ 'FEMALE' | translate}}</ion-label>
+          <ion-radio value="{{voices[language].female}}"></ion-radio>
+        </ion-item>
+      </ion-list>
+    </ion-item>
+  </ion-list>
+</ion-content>

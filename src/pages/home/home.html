@@ -1,14 +1,14 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Home</ion-title>
+    <ion-title>{{ 'HOME' | translate }}</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  <h2>Welcome to Passenger!</h2>
+  <h2>{{ 'WELCOME' | translate }}</h2>
   <button ion-button id="checkWeatherButton" 
     (click)="checkWeather()" 
     (swipeleft)="swipeleft($evt)"
     (swiperight)="swiperight($evt)"
-    block text-wrap>Check the Weather!</button>
+    block text-wrap>{{ 'CHECK' | translate }}</button>
 </ion-content>

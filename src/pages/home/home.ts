@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { NavController, Platform } from 'ionic-angular';
+import { NavController, Platform, Events } from 'ionic-angular';
 import { WeatherApiProvider, AlertDetail } from '../../providers/weather-api/weather-api';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
-import { WatsonApiProvider } from '../../providers/watson-api/watson-api';
+import { WatsonApiProvider, Translation } from '../../providers/watson-api/watson-api';
+import { SettingsProvider } from '../../providers/settings/settings';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -15,16 +16,33 @@ export class HomePage {
   private timer: any;
   private preventSimpleClick: boolean;
   private onResume: Subscription;
+  private target: string;
+  private voice: string;
 
   constructor(
     public navCtrl: NavController,
     public weather: WeatherApiProvider,
     public geo: Geolocation,
     public watson: WatsonApiProvider,
-    public platform: Platform
+    public platform: Platform,
+    public settings: SettingsProvider,
+    public events: Events
   ) {
     this.onResume = platform.resume.subscribe(() => {
       this.ionViewDidEnter();
+    });
+    settings.getLanguage().then((lang: string) => {
+      this.target = lang;
+    });
+    settings.getVoice().then((v: string) => {
+      this.voice = v;
+    });
+    // monitor the language for changes
+    events.subscribe('language:changed', (lang: string) => {
+      this.target = lang;
+    });
+    events.subscribe('voice:changed', (v: string) => {
+      this.voice = v;
     });
   }
 
@@ -32,20 +50,26 @@ export class HomePage {
     this.weather.getMockAlerts().subscribe(
       (alerts: AlertDetail[]) => {
         let msg = '';
+        let source = 'en';
         if (alerts.length > 0) {
           let add_s = alerts.length > 1 ? 'alerts' : 'alert',
               is_or_are = alerts.length > 1 ? 'are' : 'is';
-          msg = `There ${is_or_are} ${alerts.length} ${add_s} in your area. `;
+          msg = `There ${is_or_are} ${alerts.length} ${add_s} near you. `;
           // loop through the list of alerts
           for (let i = 0; i < alerts.length; i += 1) {
             msg += this.toText(alerts[i], 15);
           }
         } else {
           // all clear; no alerts
-          msg = "There does not appear to be any dangerous weather in your area right now.";
+          msg = "There does not appear to be any dangerous weather near you right now.";
         }
-        // this.messages += msg + ' ';
-        this.watson.synthesize(msg);
+        if (source !== this.target) {
+          this.watson.translate(msg, source, this.target).subscribe((t: Translation) => {
+            this.watson.synthesize(t.translations[0].translation, this.voice);
+          });
+        } else {
+          this.watson.synthesize(msg, this.voice);
+        }
       },
       (err: any) => {
         // handle error getting alerts
@@ -56,20 +80,26 @@ export class HomePage {
     this.weather.getMockAlerts().subscribe(
       (alerts: AlertDetail[]) => {
         let msg = '';
+        let source = 'en';
         if (alerts.length > 0) {
           let add_s = alerts.length > 1 ? 'alerts' : 'alert',
               is_or_are = alerts.length > 1 ? 'are' : 'is';
-          msg = `There ${is_or_are} ${alerts.length} ${add_s} in your area. `;
+          msg = `There ${is_or_are} ${alerts.length} ${add_s} near you. `;
           // loop through the list of alerts
           for (let i = 0; i < alerts.length; i += 1) {
             msg += this.toText(alerts[i], 0);
           }
         } else {
           // all clear; no alerts
-          msg = "There does not appear to be any dangerous weather in your area right now.";
+          msg = "There does not appear to be any dangerous weather near you right now.";
         }
-        // this.messages += msg + ' ';
-        this.watson.synthesize(msg);
+        if (source !== this.target) {
+          this.watson.translate(msg, source, this.target).subscribe((t: Translation) => {
+            this.watson.synthesize(t.translations[0].translation, this.voice);
+          });
+        } else {
+          this.watson.synthesize(msg, this.voice);
+        }
       },
       (err: any) => {
         // handle error getting alerts
@@ -96,20 +126,26 @@ export class HomePage {
             // this.weather.getAlerts(pos.coords.latitude, pos.coords.longitude).subscribe(
             (alerts: AlertDetail[]) => {
               let msg = '';
+              let source = 'en';
               if (alerts.length > 0) {
                 let add_s = alerts.length > 1 ? 'alerts' : 'alert',
                     is_or_are = alerts.length > 1 ? 'are' : 'is';
-                msg = `There ${is_or_are} ${alerts.length} ${add_s} in your area. `;
+                msg = `There ${is_or_are} ${alerts.length} ${add_s} near you. `;
                 // loop through the list of alerts
                 for (let i = 0; i < alerts.length; i += 1) {
                   msg += this.toText(alerts[i], 0);
                 }
               } else {
                 // all clear; no alerts
-                msg = "There does not appear to be any dangerous weather in your area right now.";
+                msg = "There does not appear to be any dangerous weather near you right now.";
               }
-              // this.messages += msg + ' ';
-              this.watson.synthesize(msg);
+              if (source !== this.target) {
+                this.watson.translate(msg, source, this.target).subscribe((t: Translation) => {
+                  this.watson.synthesize(t.translations[0].translation, this.voice);
+                });
+              } else {
+                this.watson.synthesize(msg, this.voice);
+              }
             },
             (err: any) => {
               // handle error getting alerts
