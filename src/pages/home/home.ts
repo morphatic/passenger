@@ -29,7 +29,7 @@ export class HomePage {
     public events: Events
   ) {
     this.onResume = platform.resume.subscribe(() => {
-      this.ionViewDidEnter();
+      this.checkWeather();
     });
     settings.getLanguage().then((lang: string) => {
       this.target = lang;
@@ -108,22 +108,13 @@ export class HomePage {
   }
 
   checkWeather() {
-    this.ionViewDidEnter();
-  }
-
-  checkMockWeather() {
-    this.preventSimpleClick = true;
-    clearTimeout(this.timer);
-  }
-
-  ionViewDidEnter() {
     this.geo.getCurrentPosition().then(
       (pos: Geoposition) => {
         // if speed < 45 mph (20.1168 mps)
         if ( null === pos.coords.speed || pos.coords.speed < 20.1168 ) {
           // moving slowly (or not at all) so get local nowcast
-          this.weather.getAlerts(45.58, -122.05).subscribe(
-            // this.weather.getAlerts(pos.coords.latitude, pos.coords.longitude).subscribe(
+          // this.weather.getAlerts(45.58, -122.05).subscribe(
+          this.weather.getAlerts(pos.coords.latitude, pos.coords.longitude).subscribe(
             (alerts: AlertDetail[]) => {
               let msg = '';
               let source = 'en';
@@ -152,27 +143,35 @@ export class HomePage {
             }
           );
         } else {
-          // we are moving; get alerts for 5, 10, and 15 minutes out
-          let positions = [];
-          for (let i = 1; i <= 3; i += 1) {
-            positions.push(this.getTargetPoint(pos, i * 5 ) );
-          }
+          // we are moving; get alerts for 15 minutes out
+          let position = this.getTargetPoint(pos, 15 );
           // get alerts for all three positions
-          // this.weather.getAlerts(pos.coords.latitude, pos.coords.longitude).subscribe(
-          this.weather.getAlerts(pos.coords.latitude, pos.coords.longitude).subscribe(
+          this.weather.getAlerts(position.lat, position.lon).subscribe(
             (alerts: AlertDetail[]) => {
-              // this.messages += '<br>We got back from getAlerts()';
-              // if (alert) {
-              //   let report = alert.alertDetail.texts[0].description.replace( '\n', ' ');
-              //   this.watson.synthesize(report);
-              // } else {
-              //   this.watson.synthesize("There doesn't appear to be any serious weather in your area right now.");
-              // }
+              let msg = '';
+              let source = 'en';
+              if (alerts.length > 0) {
+                let add_s = alerts.length > 1 ? 'alerts' : 'alert',
+                    is_or_are = alerts.length > 1 ? 'are' : 'is';
+                msg = `There ${is_or_are} ${alerts.length} ${add_s} ahead of you. `;
+                // loop through the list of alerts
+                for (let i = 0; i < alerts.length; i += 1) {
+                  msg += this.toText(alerts[i], 15);
+                }
+              } else {
+                // all clear; no alerts
+                msg = "You do not appear to be approaching any dangerous weather right now.";
+              }
+              if (source !== this.target) {
+                this.watson.translate(msg, source, this.target).subscribe((t: Translation) => {
+                  this.watson.synthesize(t.translations[0].translation, this.voice);
+                });
+              } else {
+                this.watson.synthesize(msg, this.voice);
+              }
             },
-            err => {
-              // this.messages += '<br>' + 'wtf?';
-              // this.messages += '<br>' + err;
-              // this.messages += '<br>' + JSON.stringify(err);
+            (err: any) => {
+              // handle error getting alerts
             }
           );
         }
@@ -184,6 +183,15 @@ export class HomePage {
         console.log(JSON.stringify(err));
       }
     );
+  }
+
+  checkMockWeather() {
+    this.preventSimpleClick = true;
+    clearTimeout(this.timer);
+  }
+
+  ionViewDidEnter() {
+    this.checkWeather();
   }
 
   private toRadians = (deg: number) => deg * Math.PI / 180;

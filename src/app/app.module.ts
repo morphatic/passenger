@@ -13,16 +13,15 @@ import { HomePage } from '../pages/home/home';
 import { SettingsPage } from '../pages/settings/settings';
 import { TabsPage } from '../pages/tabs/tabs';
 
-import { StatusBar     } from '@ionic-native/status-bar';
-import { SplashScreen  } from '@ionic-native/splash-screen';
-import { Geolocation   } from '@ionic-native/geolocation';
-import { Globalization } from '@ionic-native/globalization';
-import { File          } from '@ionic-native/file';
-import { FileTransfer  } from '@ionic-native/file-transfer';
-import { Media         } from '@ionic-native/media';
-import { MediaCapture  } from '@ionic-native/media-capture';
+import { StatusBar         } from '@ionic-native/status-bar';
+import { SplashScreen      } from '@ionic-native/splash-screen';
+import { Geolocation       } from '@ionic-native/geolocation';
+import { Globalization     } from '@ionic-native/globalization';
+import { File              } from '@ionic-native/file';
+import { FileTransfer      } from '@ionic-native/file-transfer';
+import { Media             } from '@ionic-native/media';
+import { SpeechRecognition } from '@ionic-native/speech-recognition';
 
-import { ENV } from '@app/env';
 import { WeatherApiProvider } from '../providers/weather-api/weather-api';
 import { WatsonApiProvider } from '../providers/watson-api/watson-api';
 import { SettingsProvider } from '../providers/settings/settings';
@@ -73,7 +72,7 @@ export function createTranslateLoader(http: HttpClient) {
     FileTransfer,
     Media,
     SettingsProvider,
-    MediaCapture
+    SpeechRecognition
   ]
 })
 export class AppModule {}

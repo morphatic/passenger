@@ -92,4 +92,5 @@
     <plugin name="ionic-plugin-keyboard" spec="^2.2.1" />
     <plugin name="cordova-plugin-globalization" spec="^1.0.7" />
     <plugin name="cordova-plugin-media-capture" spec="^1.4.3" />
+    <plugin name="cordova-plugin-speechrecognition" spec="^1.1.2" />
 </widget>

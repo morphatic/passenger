@@ -5,6 +5,7 @@ import { Events } from 'ionic-angular';
 export interface Language {
   name: string;
   code: string;
+  lang: string;
 }
 export interface Voice {
   male?: string;
@@ -24,20 +25,39 @@ export class SettingsProvider {
   public languages: Language[] = [
     {
       name: 'English',
-      code: 'en'
+      code: 'en',
+      lang: 'en-US'
     },
+    // {
+    //   name: 'French',
+    //   code: 'fr',
+    //   lang: 'fr-FR'
+    // },
     {
       name: 'German',
-      code: 'de'
+      code: 'de',
+      lang: 'de-DE'
     },
+    // {
+    //   name: 'Italian',
+    //   code: 'it',
+    //   lang: 'it-IT'
+    // },
     {
       name: '日本語',
-      code: 'ja'
+      code: 'ja',
+      lang: 'ja-JP'
     },
     {
       name: 'Portuguese',
-      code: 'pt'
-    }
+      code: 'pt',
+      lang: 'pt-BR'
+    }//,
+    // {
+    //   name: 'Spanish',
+    //   code: 'es',
+    //   lang: 'es-US'
+    // }
   ];
 
   public voices: Voices = {
@@ -73,6 +93,16 @@ export class SettingsProvider {
         this.setVoice(this.defaultVoice);
       }
     });
+    this.getSpeechRecognitionAvailability().then((avail: any) => {
+      if (null === avail) {
+        this.setSpeechRecognitionAvailability(false);
+      }
+    });
+    this.getSpeechRecognitionPermission().then((perm: any) => {
+      if (null === perm) {
+        this.setSpeechRecognitionPermission(false);
+      }
+    });
   }
 
   setLanguage(lang: string): void {
@@ -96,6 +126,24 @@ export class SettingsProvider {
 
   getVoice(): Promise<string> {
     return this.storage.get('voice').then((voice: string): string => voice);
+  }
+
+  setSpeechRecognitionAvailability(avail: boolean): void {
+    this.storage.set('isRecognitionAvailable', avail);
+    this.events.publish('availability:changed', avail);
+  }
+
+  getSpeechRecognitionAvailability(): Promise<boolean> {
+    return this.storage.get('isRecognitionAvailable').then((avail: boolean): boolean => avail);
+  }
+
+  setSpeechRecognitionPermission(perm: boolean): void {
+    this.storage.set('isRecognitionPermitted', perm);
+    this.events.publish('permission:changed', perm);
+  }
+
+  getSpeechRecognitionPermission(): Promise<boolean> {
+    return this.storage.get('isRecognitionPermitted').then((perm: boolean): boolean => perm);
   }
 
 }

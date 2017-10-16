@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Events } from 'ionic-angular';
 import { ENV } from '@app/env';
 import { File, FileEntry } from '@ionic-native/file';
 import { FileTransfer, FileTransferObject } from '@ionic-native/file-transfer';
@@ -27,7 +28,32 @@ export interface Transcription {
 @Injectable()
 export class WatsonApiProvider {
 
-  constructor(public file: File, public txfr: FileTransfer, public audio: Media, public http: HttpClient) {} 
+  private isCurrentlySpeaking: boolean = false;
+  private utteranceQueue: MediaObject[] = [];
+
+  constructor(
+    public file: File,
+    public txfr: FileTransfer,
+    public audio: Media,
+    public http: HttpClient,
+    public events: Events
+  ) {
+    events.subscribe('utteranceAddedToQueue', () => {
+      if (!this.isCurrentlySpeaking) {
+        this.playNextUtterance();
+      }
+    });
+    events.subscribe('utteranceStarted', () => {
+      this.isCurrentlySpeaking = true;
+    });
+    events.subscribe('utteranceEnded', () => {
+      if (this.utteranceQueue.length > 0) {
+        this.playNextUtterance();
+      } else {
+        this.isCurrentlySpeaking = false;
+      }
+    });
+  } 
 
   public synthesize(text: string, voice: string) {
     let ft: FileTransferObject = this.txfr.create();
@@ -47,7 +73,7 @@ export class WatsonApiProvider {
     ).then(
       (fe: FileEntry) => {
         let report: MediaObject = this.audio.create(fe.nativeURL);
-        report.play();
+        this.addUtteranceToQueue(report);
       },
       err => {
         console.log(JSON.stringify(err));
@@ -77,4 +103,24 @@ export class WatsonApiProvider {
     return this.http.post<Transcription>(url, file, {headers: headers, responseType: 'json'});
   }
 
+  private addUtteranceToQueue(utterance: MediaObject): void {
+    this.utteranceQueue.push(utterance);
+    this.events.publish('utteranceAddedToQueue');
+  }
+
+  private playNextUtterance(): void {
+    // get the utterance and its duration
+    let utterance = this.utteranceQueue[0];
+    let duration  = utterance.getDuration() * 1000; // convert to ms
+    // let everyone know we're currently speaking
+    this.events.publish('utteranceStarted');
+    // say what you gotta say
+    utterance.play();
+    // take the utterance out of the queue, and
+    // let people know we're done speaking
+    setTimeout(() => {
+      this.utteranceQueue.shift();
+      this.events.publish('utteranceEnded');
+    }, duration);
+  }
 }
