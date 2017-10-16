@@ -28,21 +28,21 @@ export class SettingsProvider {
       code: 'en',
       lang: 'en-US'
     },
-    // {
-    //   name: 'French',
-    //   code: 'fr',
-    //   lang: 'fr-FR'
-    // },
+    {
+      name: 'French',
+      code: 'fr',
+      lang: 'fr-FR'
+    },
     {
       name: 'German',
       code: 'de',
       lang: 'de-DE'
     },
-    // {
-    //   name: 'Italian',
-    //   code: 'it',
-    //   lang: 'it-IT'
-    // },
+    {
+      name: 'Italian',
+      code: 'it',
+      lang: 'it-IT'
+    },
     {
       name: '日本語',
       code: 'ja',
@@ -52,12 +52,12 @@ export class SettingsProvider {
       name: 'Portuguese',
       code: 'pt',
       lang: 'pt-BR'
-    }//,
-    // {
-    //   name: 'Spanish',
-    //   code: 'es',
-    //   lang: 'es-US'
-    // }
+    },
+    {
+      name: 'Spanish',
+      code: 'es',
+      lang: 'es-US'
+    }
   ];
 
   public voices: Voices = {
