@@ -27,8 +27,16 @@ export class SettingsProvider {
       code: 'en'
     },
     {
+      name: 'German',
+      code: 'de'
+    },
+    {
       name: '日本語',
       code: 'ja'
+    },
+    {
+      name: 'Portuguese',
+      code: 'pt'
     }
   ];
 

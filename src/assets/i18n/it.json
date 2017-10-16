@@ -1,0 +1,20 @@
+{
+  "HOME": "Home",
+  "INFO": "Info",
+  "SETTINGS": "Settings",
+  "HOWTO": "Usage",
+  "LANG": "Language",
+  "WELCOME": "Welcome to Passenger",
+  "CHECK": "Check the Weather!",
+  "ONHOME": "On the Home Page is one big button.",
+  "ONTAP": "On Launch/Resume/Tap",
+  "TAPTXT": "When Passenger first launches, when it resumes after having been hidden, or when you click the button it will determine your phone's current position, and let you know it there is any dangerous weather ahead or in your immediate area that you need to worry about. This will also happen when you go back to the Home Page from the About Page, or when you re-open the app when it has been hidden. (actual device data)",
+  "SWIPELEFT": "Swipe Left",
+  "SWPLFTTXT": "Passenger will let you know that you are approaching an area where there is a Flash Flood Warning in about 15 minutes. (simulated device data)",
+  "SWIPERIGHT": "Swipe Right",
+  "SWPRGTTXT": "Passenger will let you know that there is a Flash Flood Warning in your immediate area. (simulated device data)",
+  "GOOGASS": "If you have Google Assistant turned on, and set so that you can wake up the phone with your voice, you can use Passenger entirely hands free by saying \"Ok Google. Launch Passenger.\"",
+  "VOICE": "Voice",
+  "MALE": "Male",
+  "FEMALE": "Female"
+}

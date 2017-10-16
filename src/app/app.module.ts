@@ -20,6 +20,7 @@ import { Globalization } from '@ionic-native/globalization';
 import { File          } from '@ionic-native/file';
 import { FileTransfer  } from '@ionic-native/file-transfer';
 import { Media         } from '@ionic-native/media';
+import { MediaCapture  } from '@ionic-native/media-capture';
 
 import { ENV } from '@app/env';
 import { WeatherApiProvider } from '../providers/weather-api/weather-api';
@@ -71,7 +72,8 @@ export function createTranslateLoader(http: HttpClient) {
     File,
     FileTransfer,
     Media,
-    SettingsProvider
+    SettingsProvider,
+    MediaCapture
   ]
 })
 export class AppModule {}

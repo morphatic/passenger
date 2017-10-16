@@ -1,0 +1,20 @@
+{
+  "HOME": "Home",
+  "INFO": "Infoseite",
+  "SETTINGS": "Einstellungen",
+  "HOWTO": "Nutzung",
+  "LANG": "Sprache",
+  "WELCOME": "Herzlich Wilkommen!",
+  "CHECK": "Prüfe die Wetterbedingungen!",
+  "ONHOME": "Auf die Startseite finden Sie eine große Taste.",
+  "ONTAP": "Am Startplatz/Arbeit wieder aufnehmen",
+  "TAPTXT": "Es ist in der Lage, damit Sie wissen, ob es Wetterbedingungen oder andere Probleme die Sie gehen zu müssen, werden mit betroffenen und die Sie vermeiden möchten. (actual device data)",
+  "SWIPELEFT": "Streichen Sie mit dem Finger nach links",
+  "SWPLFTTXT": "Wenn Sie sich gerade einer Flutwarnung in 15 Minuten, werden Sie Passenger darauf hingewiesen. (simulated device data)",
+  "SWIPERIGHT": "Streichen Sie mit dem Finger nach rechts",
+  "SWPRGTTXT": "Wenn Sie sich gerade einer Flutwarnung, werden Sie Passenger darauf hingewiesen. (simulated device data)",
+  "GOOGASS": "Wenn Sie in einem Google-Assistent angemeldet sind,  für die freihändige Benutzung sagt \"Ok Google. Launch Passenger.\"",
+  "VOICE": "Stimme",
+  "MALE": "Mann",
+  "FEMALE": "Frau"
+}

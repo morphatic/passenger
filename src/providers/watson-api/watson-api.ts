@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ENV } from '@app/env';
 import { File, FileEntry } from '@ionic-native/file';
 import { FileTransfer, FileTransferObject } from '@ionic-native/file-transfer';
@@ -13,6 +13,16 @@ export interface Translation {
   character_count: number;
 }
 
+export interface Transcription {
+  results: {
+    alternatives: {
+      confidence: number;
+      transcript: string;
+    }[];
+    final: boolean;
+  }[];
+  result_index: number;
+}
 
 @Injectable()
 export class WatsonApiProvider {
@@ -54,6 +64,17 @@ export class WatsonApiProvider {
       'Authorization': "Basic " + btoa(ENV.watson.translation.username + ':' + ENV.watson.translation.password)
     });
     return this.http.post<Translation>(url, body, {headers: headers, responseType: 'json'});
+  }
+
+  public transcribe(file: string, model: string = 'en-US_BroadbandModel'): Observable<Transcription>{
+    let url = ENV.watson.stt.url + '/v1/recognize?model=' + model;
+    let headers = new HttpHeaders({
+      'Content-Type': 'audio/mpeg',
+      'Accept': 'application/json',
+      'Transfer-Encoding': 'chunked',
+      'Authorization': "Basic " + btoa(ENV.watson.stt.username + ':' + ENV.watson.stt.password)
+    });
+    return this.http.post<Transcription>(url, file, {headers: headers, responseType: 'json'});
   }
 
 }
