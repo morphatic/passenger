@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { NavController, Platform, Events } from 'ionic-angular';
+import { Component, NgZone } from '@angular/core';
+import { NavController, Platform, Events, AlertController } from 'ionic-angular';
 import { WeatherApiProvider, AlertDetail } from '../../providers/weather-api/weather-api';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
 import { WatsonApiProvider, Translation } from '../../providers/watson-api/watson-api';
@@ -18,6 +18,7 @@ export class HomePage {
   private onResume: Subscription;
   private target: string;
   private voice: string;
+  private isDisabled: boolean = false;
 
   constructor(
     public navCtrl: NavController,
@@ -26,7 +27,9 @@ export class HomePage {
     public watson: WatsonApiProvider,
     public platform: Platform,
     public settings: SettingsProvider,
-    public events: Events
+    public events: Events,
+    public alerts: AlertController,
+    public zone: NgZone
   ) {
     this.onResume = platform.resume.subscribe(() => {
       this.checkWeather();
@@ -43,6 +46,15 @@ export class HomePage {
     });
     events.subscribe('voice:changed', (v: string) => {
       this.voice = v;
+    });
+    events.subscribe('utteranceStarted', () => {
+      this.isDisabled = true;
+    });
+    events.subscribe('utteranceEnded', () => {
+      // force change detection in the view
+      this.zone.run(() => {
+        this.isDisabled = false;
+      });
     });
   }
 
@@ -210,7 +222,7 @@ export class HomePage {
           b = 6356752.314245,
           f = 1/298.257223563;
 
-    let φ1 = this.toRadians(pos.coords.latitude), 
+    let φ1 = this.toRadians(pos.coords.latitude),
         λ1 = this.toRadians(pos.coords.longitude),
         α1 = this.toRadians(pos.coords.heading),
         s  = pos.coords.speed * 60 * when; // distance to be traveled in 'when' minutes
@@ -270,6 +282,14 @@ export class HomePage {
     return `${aOrAn} ${description} was issued at ${issuedAt} that will be in
             effect ${in_your_area}until ${expiresAt}. ${time_to_area}This is a potentially dangerous
             situation. Please drive carefully.`;
-  } 
+  }
 
+  // private getAssessment() {
+  //   let question = "On a scale from 1 to 10, with 10 being most dangerous, how dangerous does the weather look to you right now?";
+  //   if (this.target !== 'en') {
+  //     this.watson.translate(question, 'en', this.target).subscribe((t: Translation) => {
+  //       this.watson.synthesize(t.translations[0].translation, this.voice);
+  //     });
+  //   }
+  // }
 }

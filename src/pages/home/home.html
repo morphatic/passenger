@@ -6,9 +6,13 @@
 
 <ion-content padding>
   <h2>{{ 'WELCOME' | translate }}</h2>
-  <button ion-button id="checkWeatherButton" 
-    (click)="checkWeather()" 
+  <button ion-button id="checkWeatherButton"
+    (click)="checkWeather()"
     (swipeleft)="swipeleft($evt)"
     (swiperight)="swiperight($evt)"
+    [disabled]="isDisabled"
     block text-wrap>{{ 'CHECK' | translate }}</button>
+  <button ion-button id="rateDangerButton"
+    (click)="rateDanger()"
+    block text-wrap>{{ 'RATE'  | translate }}</button>
 </ion-content>

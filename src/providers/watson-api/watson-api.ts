@@ -4,7 +4,7 @@ import { Events } from 'ionic-angular';
 import { ENV } from '@app/env';
 import { File, FileEntry } from '@ionic-native/file';
 import { FileTransfer, FileTransferObject } from '@ionic-native/file-transfer';
-import { Media, MediaObject } from '@ionic-native/media';
+import { Media, MediaObject, MEDIA_STATUS } from '@ionic-native/media';
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 
@@ -40,6 +40,7 @@ export class WatsonApiProvider {
   ) {
     events.subscribe('utteranceAddedToQueue', () => {
       if (!this.isCurrentlySpeaking) {
+        // this.isCurrentlySpeaking = true;
         this.playNextUtterance();
       }
     });
@@ -53,7 +54,7 @@ export class WatsonApiProvider {
         this.isCurrentlySpeaking = false;
       }
     });
-  } 
+  }
 
   public synthesize(text: string, voice: string) {
     let ft: FileTransferObject = this.txfr.create();
@@ -69,7 +70,7 @@ export class WatsonApiProvider {
           "Accept": "audio/ogg;codecs=opus",
           "Authorization": auth
         }
-      }        
+      }
     ).then(
       (fe: FileEntry) => {
         let report: MediaObject = this.audio.create(fe.nativeURL);
@@ -103,6 +104,10 @@ export class WatsonApiProvider {
     return this.http.post<Transcription>(url, file, {headers: headers, responseType: 'json'});
   }
 
+  public converse() {
+
+  }
+
   private addUtteranceToQueue(utterance: MediaObject): void {
     this.utteranceQueue.push(utterance);
     this.events.publish('utteranceAddedToQueue');
@@ -110,17 +115,32 @@ export class WatsonApiProvider {
 
   private playNextUtterance(): void {
     // get the utterance and its duration
-    let utterance = this.utteranceQueue[0];
-    let duration  = utterance.getDuration() * 1000; // convert to ms
-    // let everyone know we're currently speaking
-    this.events.publish('utteranceStarted');
+    let utterance = this.utteranceQueue.shift();
+    utterance.onStatusUpdate.subscribe((status: number): void => {
+      switch(status) {
+        case MEDIA_STATUS.STARTING:
+          // let everyone know we're currently speaking
+          this.events.publish('utteranceStarted');
+          break;
+        case MEDIA_STATUS.PAUSED:
+        case MEDIA_STATUS.STOPPED:
+          // let people know we're done speaking
+          this.events.publish('utteranceEnded');
+          // free up the memory
+          utterance.release();
+          break;
+      }
+    });
+
     // say what you gotta say
     utterance.play();
-    // take the utterance out of the queue, and
-    // let people know we're done speaking
-    setTimeout(() => {
-      this.utteranceQueue.shift();
-      this.events.publish('utteranceEnded');
-    }, duration);
+
+
+    // let duration  = utterance.getDuration() * 1000; // convert to ms
+    // utterance.play();
+    // // let people know we're done speaking
+    // setTimeout(() => {
+    //   this.events.publish('utteranceEnded');
+    // }, duration);
   }
 }
