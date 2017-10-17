@@ -241,64 +241,6 @@ export class WeatherApiProvider {
           "issueTimeLocalTimeZone": "PDT",
           "identifier": "95d5cf4df73b2ef022db72328e7a44b2",
           "processTimeUTC": 1508026058
-        },
-        {
-          "detailKey": "65782c9e-fa5a-3804-8172-c481b860dba7",
-          "messageTypeCode": 2,
-          "messageType": "Update",
-          "productIdentifier": "RFW",
-          "phenomena": "FW",
-          "significance": "W",
-          "eventTrackingNumber": "0003",
-          "officeCode": "KSGX",
-          "officeName": "San Diego",
-          "officeAdminDistrict": "California",
-          "officeAdminDistrictCode": "CA",
-          "officeCountryCode": "US",
-          "eventDescription": "Red Flag Warning",
-          "severityCode": 2,
-          "severity": "Severe",
-          "categories": [
-              {
-                  "category": "Met",
-                  "categoryCode": 2
-              }
-          ],
-          "responseTypes": [
-              {
-                  "responseType": "Prepare",
-                  "responseTypeCode": 3
-              }
-          ],
-          "urgency": "Expected",
-          "urgencyCode": 2,
-          "certainty": "Likely",
-          "certaintyCode": 2,
-          "effectiveTimeLocal": null,
-          "effectiveTimeLocalTimeZone": null,
-          "expireTimeLocal": "2017-10-15T12:00:00-07:00",
-          "expireTimeLocalTimeZone": "PDT",
-          "expireTimeUTC": 1508094000,
-          "onsetTimeLocal": null,
-          "onsetTimeLocalTimeZone": null,
-          "flood": null,
-          "areaTypeCode": "Z",
-          "latitude": 34.21,
-          "longitude": -117.06,
-          "areaId": "CAZ255",
-          "areaName": "San Bernardino County Mountains-Including The Mountain Top And Front Country Ranger Districts Of The San Bernardino National Forest",
-          "ianaTimeZone": "America/Los_Angeles",
-          "adminDistrictCode": "CA",
-          "adminDistrict": "California",
-          "countryCode": "US",
-          "countryName": "UNITED STATES OF AMERICA",
-          "headlineText": "Red Flag Warning until SUN 12:00 PM PDT",
-          "source": "National Weather Service",
-          "disclaimer": null,
-          "issueTimeLocal": "2017-10-14T14:34:00-07:00",
-          "issueTimeLocalTimeZone": "PDT",
-          "identifier": "93de91c083ca4904430a058441543b87",
-          "processTimeUTC": 1508016873
         }
       ]
   };

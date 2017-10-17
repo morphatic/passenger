@@ -1,7 +1,9 @@
 import { Component, NgZone } from '@angular/core';
 import { NavController, Platform, Events, AlertController } from 'ionic-angular';
-import { WeatherApiProvider, AlertDetail } from '../../providers/weather-api/weather-api';
+import { SpeechRecognition } from '@ionic-native/speech-recognition';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
+import { AndroidPermissions } from '@ionic-native/android-permissions';
+import { WeatherApiProvider, AlertDetail } from '../../providers/weather-api/weather-api';
 import { WatsonApiProvider, Translation } from '../../providers/watson-api/watson-api';
 import { SettingsProvider } from '../../providers/settings/settings';
 import { Subscription } from 'rxjs';
@@ -19,6 +21,8 @@ export class HomePage {
   private target: string;
   private voice: string;
   private isDisabled: boolean = false;
+  private recogPermitted: boolean = false;
+  private geoEnabled: boolean = false;
 
   constructor(
     public navCtrl: NavController,
@@ -29,16 +33,20 @@ export class HomePage {
     public settings: SettingsProvider,
     public events: Events,
     public alerts: AlertController,
-    public zone: NgZone
+    public zone: NgZone,
+    public sr: SpeechRecognition,
+    public perms: AndroidPermissions
   ) {
     this.onResume = platform.resume.subscribe(() => {
-      this.checkWeather();
+      // this.checkWeather();
     });
     settings.getLanguage().then((lang: string) => {
       this.target = lang;
     });
     settings.getVoice().then((v: string) => {
-      this.voice = v;
+      if (null !== v) {
+        this.voice = v;
+      }
     });
     // monitor the language for changes
     events.subscribe('language:changed', (lang: string) => {
@@ -56,150 +64,102 @@ export class HomePage {
         this.isDisabled = false;
       });
     });
+    events.subscribe('recordingOK', (isPermitted: boolean) => {
+      this.zone.run(() => {
+        this.recogPermitted = isPermitted;
+      });
+    });
   }
 
-  swipeleft(e) {
-    this.weather.getMockAlerts().subscribe(
-      (alerts: AlertDetail[]) => {
-        let msg = '';
-        let source = 'en';
-        if (alerts.length > 0) {
-          let add_s = alerts.length > 1 ? 'alerts' : 'alert',
-              is_or_are = alerts.length > 1 ? 'are' : 'is';
-          msg = `There ${is_or_are} ${alerts.length} ${add_s} near you. `;
-          // loop through the list of alerts
-          for (let i = 0; i < alerts.length; i += 1) {
-            msg += this.toText(alerts[i], 15);
-          }
-        } else {
-          // all clear; no alerts
-          msg = "There does not appear to be any dangerous weather near you right now.";
+  ionViewDidLoad() {
+    // check and request Android permissions if necessary
+    this.sr.isRecognitionAvailable().then(
+      (isAvailable: boolean) => {
+        if(isAvailable) {
+          this.sr.requestPermission().then(
+            () => {
+              this.events.publish('recordingOK', true);
+              this.geo.getCurrentPosition().then(
+                (geo: Geoposition) => {
+                  this.geoEnabled = true;
+                  this.checkWeather();
+                },
+                (err: any) => {
+                  this.geoEnabled = true;
+                  this.checkWeather();
+                }
+              );
+            },
+            () => {
+              this.events.publish('recordingOK', false);
+            }
+          );
         }
-        if (source !== this.target) {
-          this.watson.translate(msg, source, this.target).subscribe((t: Translation) => {
-            this.watson.synthesize(t.translations[0].translation, this.voice);
-          });
-        } else {
-          this.watson.synthesize(msg, this.voice);
-        }
-      },
-      (err: any) => {
-        // handle error getting alerts
-      }
-    );
-  }
-  swiperight(e) {
-    this.weather.getMockAlerts().subscribe(
-      (alerts: AlertDetail[]) => {
-        let msg = '';
-        let source = 'en';
-        if (alerts.length > 0) {
-          let add_s = alerts.length > 1 ? 'alerts' : 'alert',
-              is_or_are = alerts.length > 1 ? 'are' : 'is';
-          msg = `There ${is_or_are} ${alerts.length} ${add_s} near you. `;
-          // loop through the list of alerts
-          for (let i = 0; i < alerts.length; i += 1) {
-            msg += this.toText(alerts[i], 0);
-          }
-        } else {
-          // all clear; no alerts
-          msg = "There does not appear to be any dangerous weather near you right now.";
-        }
-        if (source !== this.target) {
-          this.watson.translate(msg, source, this.target).subscribe((t: Translation) => {
-            this.watson.synthesize(t.translations[0].translation, this.voice);
-          });
-        } else {
-          this.watson.synthesize(msg, this.voice);
-        }
-      },
-      (err: any) => {
-        // handle error getting alerts
       }
     );
   }
 
   checkWeather() {
-    this.geo.getCurrentPosition().then(
-      (pos: Geoposition) => {
-        // if speed < 45 mph (20.1168 mps)
-        if ( null === pos.coords.speed || pos.coords.speed < 20.1168 ) {
-          // moving slowly (or not at all) so get local nowcast
-          // this.weather.getAlerts(45.58, -122.05).subscribe(
-          this.weather.getAlerts(pos.coords.latitude, pos.coords.longitude).subscribe(
-            (alerts: AlertDetail[]) => {
-              let msg = '';
-              let source = 'en';
-              if (alerts.length > 0) {
-                let add_s = alerts.length > 1 ? 'alerts' : 'alert',
-                    is_or_are = alerts.length > 1 ? 'are' : 'is';
-                msg = `There ${is_or_are} ${alerts.length} ${add_s} near you. `;
-                // loop through the list of alerts
-                for (let i = 0; i < alerts.length; i += 1) {
-                  msg += this.toText(alerts[i], 0);
+    if (this.geoEnabled) {
+      this.geo.getCurrentPosition().then(
+        (pos: Geoposition) => {
+          this.events.subscribe('utteranceEnded', this.rateDanger );
+          // if speed < 45 mph (20.1168 mps)
+          if ( null === pos.coords.speed || pos.coords.speed < 20.1168 ) {
+            // moving slowly (or not at all) so get local nowcast
+            this.weather.getAlerts(pos.coords.latitude, pos.coords.longitude).subscribe(
+              (alerts: AlertDetail[]) => {
+                let msg = '';
+                if (alerts.length > 0) {
+                  let add_s = alerts.length > 1 ? 'alerts' : 'alert',
+                      is_or_are = alerts.length > 1 ? 'are' : 'is';
+                  msg = `There ${is_or_are} ${alerts.length} ${add_s} near you. `;
+                  // loop through the list of alerts
+                  for (let i = 0; i < alerts.length; i += 1) {
+                    msg += this.toText(alerts[i], 0);
+                  }
+                } else {
+                  // all clear; no alerts
+                  msg = "There does not appear to be any dangerous weather near you right now.";
                 }
-              } else {
-                // all clear; no alerts
-                msg = "There does not appear to be any dangerous weather near you right now.";
+                this.synthesize(msg);
+              },
+              (err: any) => {
+                // handle error getting alerts
               }
-              if (source !== this.target) {
-                this.watson.translate(msg, source, this.target).subscribe((t: Translation) => {
-                  this.watson.synthesize(t.translations[0].translation, this.voice);
-                });
-              } else {
-                this.watson.synthesize(msg, this.voice);
-              }
-            },
-            (err: any) => {
-              // handle error getting alerts
-            }
-          );
-        } else {
-          // we are moving; get alerts for 15 minutes out
-          let position = this.getTargetPoint(pos, 15 );
-          // get alerts for all three positions
-          this.weather.getAlerts(position.lat, position.lon).subscribe(
-            (alerts: AlertDetail[]) => {
-              let msg = '';
-              let source = 'en';
-              if (alerts.length > 0) {
-                let add_s = alerts.length > 1 ? 'alerts' : 'alert',
-                    is_or_are = alerts.length > 1 ? 'are' : 'is';
-                msg = `There ${is_or_are} ${alerts.length} ${add_s} ahead of you. `;
-                // loop through the list of alerts
-                for (let i = 0; i < alerts.length; i += 1) {
-                  msg += this.toText(alerts[i], 15);
+            );
+          } else {
+            // we are moving; get alerts for 15 minutes out
+            let position = this.getTargetPoint(pos, 15 );
+            // get alerts for all three positions
+            this.weather.getAlerts(position.lat, position.lon).subscribe(
+              (alerts: AlertDetail[]) => {
+                let msg = '';
+                if (alerts.length > 0) {
+                  let add_s = alerts.length > 1 ? 'alerts' : 'alert',
+                      is_or_are = alerts.length > 1 ? 'are' : 'is';
+                  msg = `There ${is_or_are} ${alerts.length} ${add_s} ahead of you. `;
+                  // loop through the list of alerts
+                  for (let i = 0; i < alerts.length; i += 1) {
+                    msg += this.toText(alerts[i], 15);
+                  }
+                } else {
+                  // all clear; no alerts
+                  msg = "You do not appear to be approaching any dangerous weather right now.";
                 }
-              } else {
-                // all clear; no alerts
-                msg = "You do not appear to be approaching any dangerous weather right now.";
+                this.synthesize(msg);
+              },
+              (err: any) => {
+                // handle error getting alerts
               }
-              if (source !== this.target) {
-                this.watson.translate(msg, source, this.target).subscribe((t: Translation) => {
-                  this.watson.synthesize(t.translations[0].translation, this.voice);
-                });
-              } else {
-                this.watson.synthesize(msg, this.voice);
-              }
-            },
-            (err: any) => {
-              // handle error getting alerts
-            }
-          );
+            );
+          }
         }
-      }
-    ).catch(
-      err => {
-        // this.messages = "<br>geolocation didn't work";
-        console.log(err);
-        console.log(JSON.stringify(err));
-      }
-    );
-  }
-
-  checkMockWeather() {
-    this.preventSimpleClick = true;
-    clearTimeout(this.timer);
+      ).catch(
+        err => {
+        }
+      );
+    }
   }
 
   ionViewDidEnter() {
@@ -281,15 +241,89 @@ export class HomePage {
             approximately ${min} minutes. `;
     return `${aOrAn} ${description} was issued at ${issuedAt} that will be in
             effect ${in_your_area}until ${expiresAt}. ${time_to_area}This is a potentially dangerous
-            situation. Please drive carefully.`;
+            situation. Please drive carefully. `;
   }
 
-  // private getAssessment() {
-  //   let question = "On a scale from 1 to 10, with 10 being most dangerous, how dangerous does the weather look to you right now?";
-  //   if (this.target !== 'en') {
-  //     this.watson.translate(question, 'en', this.target).subscribe((t: Translation) => {
-  //       this.watson.synthesize(t.translations[0].translation, this.voice);
-  //     });
-  //   }
-  // }
+  private rateDanger = () => {
+    this.events.unsubscribe('utteranceEnded', this.rateDanger );
+    if (this.recogPermitted) {
+      let question = "On a scale from 1 to 10, with 10 being most dangerous, how dangerous does the weather look to you right now?";
+      this.events.subscribe('utteranceEnded', this.getResponse );
+      this.synthesize(question);
+    }
+  }
+
+  private getResponse = () => {
+    this.events.unsubscribe('utteranceEnded', this.getResponse);
+    this.sr.startListening({language: this.target, showPopup: false}).subscribe(
+      (matches: string[]) => {
+        let rating = matches[0].match(/\d+/);
+        if (null !== rating) {
+          let response = `You rated the danger of this weather as a ${rating}. `;
+          if (+rating <= 5) {
+            response += `You know, most people rate the danger of this weather as a 6 or 7. You might want to drive a bit more carefully`;
+          } else {
+            response += `That is about the same as other people rate it. Drive carefully.`;
+          }
+          this.synthesize(response);
+        } else {
+          this.synthesize("Sorry, I didn't understand your rating. Please try again.");
+          this.getResponse();
+        }
+      },
+      (err: any) => {
+          this.synthesize("Sorry, I had a problem hearing what you said.");
+      }
+    );
+  }
+
+  private synthesize(text: string, source: string = 'en', target: string = this.target) {
+    if (source !== target) {
+      this.watson.translate(text, source, target).subscribe((t: Translation) => {
+        this.watson.synthesize(t.translations[0].translation, this.voice);
+      });
+    } else {
+      this.watson.synthesize(text, this.voice);
+    }
+  }
+
+  /**
+   * Mock responses below. Remove after demo.
+   */
+
+  swipeleft(e) {
+    this.getMockAlerts(15);
+  }
+  swiperight(e) {
+    this.getMockAlerts(0);
+  }
+
+  checkMockWeather() {
+    this.preventSimpleClick = true;
+    clearTimeout(this.timer);
+  }
+
+  getMockAlerts(distance: number) {
+    this.weather.getMockAlerts().subscribe(
+      (alerts: AlertDetail[]) => {
+        let msg = '';
+        if (alerts.length > 0) {
+          let add_s = alerts.length > 1 ? 'alerts' : 'alert',
+              is_or_are = alerts.length > 1 ? 'are' : 'is';
+          msg = `There ${is_or_are} ${alerts.length} ${add_s} near you. `;
+          // loop through the list of alerts
+          for (let i = 0; i < alerts.length; i += 1) {
+            msg += this.toText(alerts[i], distance);
+          }
+        } else {
+          // all clear; no alerts
+          msg = "There does not appear to be any dangerous weather near you right now.";
+        }
+        this.synthesize(msg);
+      },
+      (err: any) => {
+        // handle error getting alerts
+      }
+    );
+  }
 }

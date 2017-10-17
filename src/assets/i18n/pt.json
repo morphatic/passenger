@@ -5,6 +5,7 @@
   "HOWTO": "Como Usar",
   "LANG": "Linguagem",
   "WELCOME": "Bem Vindo ao Passageiro",
+  "WELCOMEMSG": "Selecione seu idioma e clique no botão \"Home\".",
   "CHECK": "Verifique o Tempo!",
   "ONHOME": "Na Página Inicial busque o Botão Grande.",
   "ONTAP": "Ao Lançar/Resuma/Toque",
@@ -16,5 +17,6 @@
   "GOOGASS": "Se você tiver o Assistente Google ligado, e o tiver configurado para despertar o seu fone com sua voz, você pode usar o Passageiro sem ter que manuseá-lo simplesmente dizendo \"Ok Google. Abra o Passageiro.\"",
   "VOICE": "Voz",
   "MALE": "Masculino",
-  "FEMALE": "Feminino"
+  "FEMALE": "Feminino",
+  "RATE": "Classifique Seu Nível de Perigo"
 }

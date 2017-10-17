@@ -5,6 +5,7 @@
   "HOWTO": "Usage",
   "LANG": "Langage",
   "WELCOME": "Bienvenue à Passager",
+  "WELCOMEMSG": "Veuillez sélectionner votre langue, puis cliquez sur le bouton \"Accueil\".",
   "CHECK": "Vérifiez la météo!",
   "ONHOME": "Sur la page d'accueil, il y a un gros bouton.",
   "ONTAP": "Lancer/Résumer/Tapoter",
@@ -16,5 +17,6 @@
   "GOOGASS": "Si vous avez activé Google Assistant et configuré pour que vous puissiez réveiller le téléphone avec votre voix, vous pouvez utiliser Passenger entièrement mains libres en disant \"Ok Google. Lancez Passager.\"",
   "VOICE": "Voix",
   "MALE": "Mâle",
-  "FEMALE": "Femelle"
+  "FEMALE": "Femelle",
+  "RATE": "Évaluez Votre Niveau de Danger"
 }

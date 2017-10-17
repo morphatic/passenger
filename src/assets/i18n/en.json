@@ -5,6 +5,7 @@
   "HOWTO": "Usage",
   "LANG": "Language",
   "WELCOME": "Welcome to Passenger",
+  "WELCOMEMSG": "Please select your language, then click on the \"Home\" button.",
   "CHECK": "Check the Weather!",
   "ONHOME": "On the Home Page is one big button.",
   "ONTAP": "On Launch/Resume/Tap",
@@ -16,5 +17,6 @@
   "GOOGASS": "If you have Google Assistant turned on, and set so that you can wake up the phone with your voice, you can use Passenger entirely hands free by saying \"Ok Google. Launch Passenger.\"",
   "VOICE": "Voice",
   "MALE": "Male",
-  "FEMALE": "Female"
+  "FEMALE": "Female",
+  "RATE": "Rate Your Danger Level"
 }

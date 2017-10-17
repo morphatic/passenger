@@ -88,6 +88,13 @@ export class SettingsProvider {
   };
 
   constructor(public storage: Storage, public events: Events) {
+    this.isFirstLoad().then((isFirst: boolean) => {
+      if (null === isFirst) {
+        this.storage.set('isFirstLoad', true);
+      } else if(isFirst) {
+        this.storage.set('isFirstLoad', false);
+      }
+    });
     this.getVoice().then((voice: any) => {
       if (null === voice) {
         this.setVoice(this.defaultVoice);
@@ -103,6 +110,10 @@ export class SettingsProvider {
         this.setSpeechRecognitionPermission(false);
       }
     });
+  }
+
+  isFirstLoad(): Promise<boolean> {
+    return this.storage.get('isFirstLoad').then((isFirst: boolean) => isFirst);
   }
 
   setLanguage(lang: string): void {

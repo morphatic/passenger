@@ -60,9 +60,9 @@ $colors: (
   background-color: #e6e7e8 !important;
 }
 
-#checkWeatherButton {
-  height: 80%;
-  margin: 10% 0;
+#checkWeatherButton, #rateDangerButton {
+  height: 40%;
+  margin: 5% 0;
   font-size: 2em;
 }
 

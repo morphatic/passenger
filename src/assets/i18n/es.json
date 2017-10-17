@@ -5,6 +5,7 @@
   "HOWTO": "Uso",
   "LANG": "Lenguaje",
   "WELCOME": "Bienvenidos A Pasajero",
+  "WELCOMEMSG": "Seleccione su idioma, luego haga clic en el botón \"Inicio\".",
   "CHECK": "Verificar el clima!",
   "ONHOME": "En la página de inicio hay un gran botón.",
   "ONTAP": "Al Lanzar/Continuar/Pulsar",
@@ -16,5 +17,6 @@
   "GOOGASS": "Si tienes Google Assistant activado y configurado para que puedas despertar el teléfono con tu voz, puedes usar el pasajero completamente manos libres diciendo \"OK Google. Lanza Pasajero.\"",
   "VOICE": "Voz",
   "MALE": "Masculino",
-  "FEMALE": "Femenino"
+  "FEMALE": "Femenino",
+  "RATE": "Califica Tu Nivel de Peligro"
 }

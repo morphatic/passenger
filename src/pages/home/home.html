@@ -14,5 +14,6 @@
     block text-wrap>{{ 'CHECK' | translate }}</button>
   <button ion-button id="rateDangerButton"
     (click)="rateDanger()"
+    [disabled]="isDisabled"
     block text-wrap>{{ 'RATE'  | translate }}</button>
 </ion-content>

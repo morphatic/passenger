@@ -13,6 +13,7 @@
         "i18n": "ng-xi18n"
     },
     "dependencies": {
+        "@angular/animations": "^4.4.3",
         "@angular/common": "4.4.3",
         "@angular/compiler": "4.4.3",
         "@angular/compiler-cli": "4.4.3",
@@ -22,6 +23,7 @@
         "@angular/platform-browser": "4.4.3",
         "@angular/platform-browser-dynamic": "4.4.3",
         "@angular/platform-server": "4.4.3",
+        "@ionic-native/android-permissions": "^4.3.1",
         "@ionic-native/core": "4.3.0",
         "@ionic-native/file": "^4.2.1",
         "@ionic-native/file-transfer": "^4.2.1",
@@ -34,7 +36,8 @@
         "@ionic/storage": "2.0.1",
         "@ngx-translate/core": "^8.0.0",
         "@ngx-translate/http-loader": "^2.0.0",
-        "cordova-android": "^6.3.0",
+        "cordova-android": "^6.2.3",
+        "cordova-plugin-android-permissions": "^1.0.0",
         "cordova-plugin-compat": "^1.2.0",
         "cordova-plugin-console": "^1.1.0",
         "cordova-plugin-device": "^1.1.6",
@@ -73,7 +76,8 @@
             "cordova-plugin-file": {},
             "cordova-plugin-media": {},
             "cordova-plugin-globalization": {},
-            "cordova-plugin-speechrecognition": {}
+            "cordova-plugin-speechrecognition": {},
+            "cordova-plugin-android-permissions": {}
         },
         "platforms": [
             "android"

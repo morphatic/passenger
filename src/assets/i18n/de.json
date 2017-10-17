@@ -5,6 +5,7 @@
   "HOWTO": "Nutzung",
   "LANG": "Sprache",
   "WELCOME": "Herzlich Wilkommen!",
+  "WELCOMEMSG": "Bitte wählen Sie Ihre Sprache aus und klicken Sie auf die Schaltfläche \"Home\".",
   "CHECK": "Prüfe die Wetterbedingungen!",
   "ONHOME": "Auf die Startseite finden Sie eine große Taste.",
   "ONTAP": "Am Startplatz/Arbeit wieder aufnehmen",
@@ -16,5 +17,6 @@
   "GOOGASS": "Wenn Sie in einem Google-Assistent angemeldet sind,  für die freihändige Benutzung sagt \"Ok Google. Launch Passenger.\"",
   "VOICE": "Stimme",
   "MALE": "Mann",
-  "FEMALE": "Frau"
+  "FEMALE": "Frau",
+  "RATE": "Bewerten Sie Ihre Gefahrenstufe"
 }

@@ -5,6 +5,7 @@
   "HOWTO": "Uso",
   "LANG": "Lingua",
   "WELCOME": "Benvenuti a Passeggero",
+  "WELCOMEMSG": "Seleziona la tua lingua, quindi fai clic sul pulsante \"Casa\".",
   "CHECK": "Controlla il tempo!",
   "ONHOME": "Nella home page è un pulsante grande.",
   "ONTAP": "Lanciare/Riprendere/Picchiettare",
@@ -16,5 +17,6 @@
   "GOOGASS": "Se hai attivato Google Assistant e impostato in modo che tu possa svegliare il telefono con la tua voce, puoi usare il passeggero completamente a mani libere dicendo \"Ok Google. Lanci Passeggero.\"",
   "VOICE": "Voce",
   "MALE": "Maschio",
-  "FEMALE": "Femmina"
+  "FEMALE": "Femmina",
+  "RATE": "Valuta Il Tuo Livello di Pericolo"
 }
